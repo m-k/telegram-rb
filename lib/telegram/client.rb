@@ -93,11 +93,13 @@ module Telegram
       logger.info("Start polling for events")
       while (data = @stdout.gets)
         begin
+          logger.info("-- CLI raw data: #{data}")
           brace = data.index('{')
           data = data[brace..-2]
           data = Oj.load(data, mode: :compat)
           @events << data
-        rescue
+        rescue => e
+          logger.error(e)
         end
       end
     end
@@ -108,6 +110,7 @@ module Telegram
     def process_data
       process = Proc.new { |data|
         begin
+          logger.info("-- RB event data: #{data}")
           type = case data['event']
           when 'message'
             if data['from']['peer_id'] != @profile.id
