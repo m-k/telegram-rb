@@ -36,6 +36,7 @@ module Telegram
           logger.info 'Authorization: successfully completed'
           return true
         else
+          log_response(data)
           # ping telegram-cli after stdout is inactive 2 sec (expects that
           # there is no bigger delay between stdout and next stdin request)
           watcher.call_after(2)
@@ -46,6 +47,10 @@ module Telegram
     private
 
     attr_accessor :std_in_out, :properties, :logger
+
+    def log_response(data)
+      logger.info "Response: #{data.strip}" if data.include? 'result'
+    end
 
     def handle_phone_number
       raise 'Incorrect phone number' if @_phone_number_triggered
